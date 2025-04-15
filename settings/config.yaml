@@ -1,0 +1,22 @@
+# settings/config.yaml
+# Global configuration settings for the AI Agent System
+
+logging:
+  level: INFO # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file: system.log # Optional: log to a file
+
+agent_defaults:
+  max_retries: 3
+  default_model_preference: ["gpt-4", "claude-3-opus", "gemini-pro"] # Order matters for preference
+  memory_type: "simple_dict" # Could be "vector_db", "redis", etc. later
+
+model_router:
+  timeout_seconds: 120 # Timeout for model API calls
+  # Add any specific router configurations here
+
+tool_settings:
+  web_search_provider: "duckduckgo" # Options: duckduckgo, tavily, serper, etc.
+  # Add API keys for tools if needed (e.g., SERPER_API_KEY in .env)
+
+# Add other system-wide settings as the project grows
