@@ -139,6 +139,53 @@ MODEL_REGISTRY: Dict[str, ModelMetadata] = {
     # },
 }
 
+MODEL_REGISTRY.update({
+    "deepseek-chat": { # Internal ID we choose
+        "provider": "openrouter",
+        "connector_class": "OpenRouterConnector",
+        "api_model_name": "deepseek/deepseek-chat", # Exact ID for OpenRouter API
+        "capabilities": ["chat", "code", "reasoning", "fast"], # Adjust based on DeepSeek's known strengths
+        "cost_tier": "medium", # Or "low"/"free" depending on which version (check OpenRouter pricing)
+        "preferred_priority": 5, # Assign a priority level
+        "limits": {}, # Define if known (check OpenRouter docs for rate limits)
+        "fallbacks": ["deepseek-coder"] # Example fallback
+    },
+    "deepseek-coder": { # Internal ID
+        "provider": "openrouter",
+        "connector_class": "OpenRouterConnector",
+        "api_model_name": "deepseek/deepseek-coder", # Exact ID for OpenRouter API
+        "capabilities": ["chat", "code", "reasoning", "coding_tasks"],
+        "cost_tier": "medium", # Or "low"/"free"
+        "preferred_priority": 4, # Higher priority for coding tasks maybe?
+        "limits": {},
+        "fallbacks": ["gpt-3.5-turbo"] # Example fallback to another provider
+    },
+    # Example for the free tier if you want to explicitly target it
+    "deepseek-chat-free": {
+         "provider": "openrouter",
+         "connector_class": "OpenRouterConnector",
+         "api_model_name": "deepseek/deepseek-chat", # Map to the same base model for now
+         # OR if OpenRouter has a specific :free identifier use that:
+         # "api_model_name": "deepseek/deepseek-chat:free", # As per user instructions - use this if valid!
+         "capabilities": ["chat", "code", "reasoning", "fast"],
+         "cost_tier": "free", # Explicitly mark as free
+         "preferred_priority": 8, # Lower priority than paid usually
+         "limits": {"rate_limit_rpm": 10}, # Example: Put known free tier limits here
+         "fallbacks": []
+     },
+    # Add other OpenRouter models as needed (e.g., Mistral, Llama)
+    # "mistral-7b-instruct-openrouter": {
+    #     "provider": "openrouter",
+    #     "connector_class": "OpenRouterConnector",
+    #     "api_model_name": "mistralai/mistral-7b-instruct",
+    #     "capabilities": ["chat", "fast", "simple_tasks"],
+    #     "cost_tier": "very_low",
+    #     "preferred_priority": 9,
+    #     "limits": {},
+    #     "fallbacks": []
+    # },
+})
+
 def get_model_metadata(model_id: str) -> Optional[ModelMetadata]: # <- Optional is used here
     """Helper function to safely retrieve metadata for a given model ID."""
     return MODEL_REGISTRY.get(model_id)
@@ -170,3 +217,12 @@ if __name__ == "__main__":
     vision_models = get_model_ids_by_capability("vision")
     print(f"Models with 'vision' capability: {vision_models}")
     print("-----------------------------")
+
+
+    print(f"\nMetadata for deepseek-chat:")
+    ds_meta = get_model_metadata("deepseek-chat")
+    if ds_meta:
+         for key, value in ds_meta.items():
+             print(f"  {key}: {value}")
+    else:
+        print("  deepseek-chat not found in registry.")
